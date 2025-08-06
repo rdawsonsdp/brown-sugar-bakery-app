@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brown Sugar Bakery - Orders</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bakery: {
+                            500: '#ed7614',
+                            600: '#d45d0a',
+                            700: '#b8480a',
+                        },
+                        brown: {
+                            700: '#977669',
+                            900: '#43302b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .loading-spin {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-brown-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <h1 class="text-xl font-bold">🎂 Brown Sugar Bakery</h1>
+                    </div>
+                    <div class="flex space-x-8">
+                        <a href="#dashboard" class="hover:text-bakery-500">Dashboard</a>
+                        <a href="#orders" class="hover:text-bakery-500 text-bakery-500">Orders</a>
+                        <a href="#products" class="hover:text-bakery-500">Products</a>
+                        <a href="#reports" class="hover:text-bakery-500">Reports</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Open Orders</h2>
+                <p class="text-gray-600">Manage customer orders and track fulfillment</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <div class="flex gap-4">
+                    <input type="text" placeholder="Search orders..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-bakery-500 focus:border-transparent">
+                    <select class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option>All Status</option>
+                        <option>New</option>
+                        <option>In Progress</option>
+                        <option>Ready</option>
+                        <option>Completed</option>
+                    </select>
+                    <button class="bg-bakery-500 text-white px-6 py-2 rounded-lg hover:bg-bakery-600">
+                        + New Order
+                    </button>
+                </div>
+            </div>
+
+            <!-- Orders Table -->
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer First Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer Last Name</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pickup Due Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="ordersTableBody">
+                        <!-- Orders will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Order Form Modal -->
+    <div id="orderModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">New Order</h3>
+            
+            <form id="orderForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Customer First Name</label>
+                    <input type="text" name="firstName" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Customer Last Name</label>
+                    <input type="text" name="lastName" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Order Date</label>
+                    <input type="date" name="orderDate" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Pickup Due Date</label>
+                    <input type="date" name="pickupDate" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                    <p class="text-sm text-red-600 mt-1">Orders are Due for Pickup no later than 3pm. No pickups Sunday or Monday</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Due Pickup Time</label>
+                    <select name="pickupTime" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="12:00:00 PM">12:00:00 PM</option>
+                        <option value="12:30:00 PM">12:30:00 PM</option>
+                        <option value="1:00:00 PM">1:00:00 PM</option>
+                        <option value="1:30:00 PM">1:30:00 PM</option>
+                        <option value="2:00:00 PM">2:00:00 PM</option>
+                        <option value="2:30:00 PM">2:30:00 PM</option>
+                        <option value="3:00:00 PM">3:00:00 PM</option>
+                        <option value="3:30:00 PM">3:30:00 PM</option>
+                        <option value="4:00:00 PM">4:00:00 PM</option>
+                        <option value="4:30:00 PM">4:30:00 PM</option>
+                        <option value="5:00:00 PM">5:00:00 PM</option>
+                        <option value="5:30:00 PM">5:30:00 PM</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Bakery Products for Order</label>
+                    <textarea name="notes" rows="3" class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter Order Notes:"></textarea>
+                </div>
+                
+                <div class="flex justify-end space-x-2 pt-4">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-bakery-500 text-white rounded-md hover:bg-bakery-600">
+                        Create Order
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Sample order data
+        const orders = [
+            { status: 'New', firstName: 'Testing', lastName: 'Robertt', pickupDate: '3/3/2025' },
+            { status: 'New', firstName: 'viella', lastName: 'Brooks', pickupDate: '3/4/2025' },
+            { status: 'New', firstName: 'Marisa', lastName: 'Christy', pickupDate: '3/4/2025' },
+            { status: 'New', firstName: 'Lavetrice', lastName: 'Watson', pickupDate: '3/4/2025' },
+            { status: 'New', firstName: 'Adrian', lastName: 'Magana', pickupDate: '3/4/2025' },
+            { status: 'New', firstName: 'Corey', lastName: 'Brown', pickupDate: '3/5/2025' },
+            { status: 'New', firstName: 'Tamika', lastName: 'Mackey', pickupDate: '3/5/2025' },
+            { status: 'New', firstName: 'Sheldon', lastName: 'Rice', pickupDate: '3/5/2025' },
+            { status: 'New', firstName: 'Willy', lastName: 'Stewart', pickupDate: '3/6/2025' },
+        ];
+
+        // Function to render orders table
+        function renderOrders() {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            • ${order.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${order.firstName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${order.lastName}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">${order.pickupDate}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <button class="text-bakery-600 hover:text-bakery-700">View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Modal functions
+        function openModal() {
+            document.getElementById('orderModal').classList.remove('hidden');
+            // Set today's date as default
+            document.querySelector('input[name="orderDate"]').value = new Date().toISOString().split('T')[0];
+        }
+
+        function closeModal() {
+            document.getElementById('orderModal').classList.add('hidden');
+            document.getElementById('orderForm').reset();
+        }
+
+        // Form submission
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const newOrder = {
+                status: 'New',
+                firstName: formData.get('firstName'),
+                lastName: formData.get('lastName'),
+                pickupDate: new Date(formData.get('pickupDate')).toLocaleDateString('en-US')
+            };
+            orders.unshift(newOrder);
+            renderOrders();
+            closeModal();
+        });
+
+        // Add event listener to new order button
+        document.querySelector('button:contains("New Order")').addEventListener('click', openModal);
+
+        // Initial render
+        renderOrders();
+
+        // Fix button selector
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (button.textContent.includes('New Order')) {
+                    button.addEventListener('click', openModal);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
