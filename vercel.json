@@ -1,0 +1,19 @@
+{
+  "name": "brown-sugar-bakery-app",
+  "version": 2,
+  "builds": [
+    {
+      "src": "bakery-app/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "bakery-app/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
