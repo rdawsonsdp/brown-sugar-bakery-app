@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 """
-Main scheduler for Shopify sync operations
-Runs the sync process every 5 minutes
+Railway Function for Shopify to Supabase Sync
+Triggered by cron schedule every 5 minutes
 """
 
-import time
-import logging
-import schedule
 import os
 import requests
+import logging
 from datetime import datetime
 from supabase import create_client
 
@@ -84,32 +82,32 @@ class ShopifySync:
             logging.error(f"Error processing order {order.get('order_number')}: {e}")
             return False
 
-def run_sync():
-    """Run the sync process"""
+def handler(event=None, context=None):
+    """Railway Function handler - called by cron schedule"""
     try:
-        logging.info("🚀 Starting Shopify sync...")
+        logging.info("🚀 Railway Function triggered - Starting Shopify sync...")
         sync = ShopifySync()
+        
         if sync.sync_orders():
             logging.info("✅ Sync completed successfully")
+            return {
+                "statusCode": 200,
+                "body": "Sync completed successfully"
+            }
         else:
             logging.error("❌ Sync failed")
+            return {
+                "statusCode": 500,
+                "body": "Sync failed"
+            }
+            
     except Exception as e:
-        logging.error(f"💥 Sync error: {e}")
+        logging.error(f"💥 Function error: {e}")
+        return {
+            "statusCode": 500,
+            "body": f"Error: {str(e)}"
+        }
 
-def main():
-    """Main scheduler loop"""
-    logging.info("🕐 Starting Shopify sync scheduler (every 5 minutes)...")
-    
-    # Schedule sync every 5 minutes
-    schedule.every(5).minutes.do(run_sync)
-    
-    # Run initial sync
-    run_sync()
-    
-    # Keep scheduler running
-    while True:
-        schedule.run_pending()
-        time.sleep(30)
-
+# For local testing
 if __name__ == "__main__":
-    main()
+    handler()
